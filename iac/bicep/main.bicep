@@ -6,7 +6,7 @@ targetScope = 'subscription'
 param dprg string= 'fabricautov1'
 
 @description('Resource group location')
-param rglocation string = 'australiaeast'
+param rglocation string = 'eastus'
 
 @description('Cost Centre tag that will be applied to all resources in this deployment')
 param cost_centre_tag string = 'MCAPS'
@@ -24,10 +24,10 @@ param deployment_suffix string = utcNow()
 param purviewrg string= 'rg-purview'
 
 @description('Flag to indicate whether to create a new Purview resource with this data platform deployment')
-param create_purview bool = false
+param create_purview bool = true
 
 @description('Flag to indicate whether to enable integration of data platform resources with either an existing or new Purview resource')
-param enable_purview bool = false
+param enable_purview bool = true
 
 @description('Resource Name of new or existing Purview Account. Specify a resource name if create_purview=true or enable_purview=true')
 param purview_name string = 'ContosoDG'
@@ -55,16 +55,16 @@ resource fabric_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
 }
 
 
-// // Create purview resource group
-// resource purview_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = if (create_purview) {
-//   name: purviewrg 
-//   location: rglocation
-//   tags: {
-//          CostCentre: cost_centre_tag
-//          Owner: owner_tag
-//          SME: sme_tag
-//    }
-//  }
+// Create purview resource group
+resource purview_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = if (create_purview) {
+  name: purviewrg 
+  location: rglocation
+  tags: {
+         CostCentre: cost_centre_tag
+         Owner: owner_tag
+         SME: sme_tag
+   }
+ }
 
  // Create audit resource group
 resource audit_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
@@ -78,21 +78,21 @@ resource audit_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
  }
 
 
-//  // Deploy Purview using module
-// module purview './modules/purview.bicep' = if (create_purview || enable_purview) {
-//   name: purview_deployment_name
-//   scope: purview_rg
-//   params:{
-//     create_purview: create_purview
-//     purviewrg: purviewrg
-//     purview_name: purview_name
-//     location: purview_rg.location
-//     cost_centre_tag: cost_centre_tag
-//     owner_tag: owner_tag
-//     sme_tag: sme_tag
-//   }
+ // Deploy Purview using module
+module purview './modules/purview.bicep' = if (create_purview || enable_purview) {
+  name: purview_deployment_name
+  scope: purview_rg
+  params:{
+    create_purview: create_purview
+    purviewrg: purviewrg
+    purview_name: purview_name
+    location: purview_rg.location
+    cost_centre_tag: cost_centre_tag
+    owner_tag: owner_tag
+    sme_tag: sme_tag
+  }
   
-// }
+}
 
 // Deploy Key Vault with default access policies using module
 module kv './modules/keyvault.bicep' = {
