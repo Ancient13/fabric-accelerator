@@ -3,7 +3,7 @@ targetScope = 'subscription'
 
 // Parameters c
 @description('Resource group where Microsoft Fabric capacity will be deployed. Resource group will be created if it doesnt exist')
-param dprg string= 'fabricautov1'
+param dprg string= 'fabricautov2'
 
 @description('Resource group location')
 param rglocation string = 'australiaeast'
@@ -33,7 +33,7 @@ param enable_purview bool = true
 param purview_name string = 'ContosoDGtsPurview'
 
 @description('Resource group where audit resources will be deployed. Resource group will be created if it doesnt exist')
-param auditrg string= 'rg-audit'
+param auditrg string= 'rg-audit2'
 
 
 // Variables
