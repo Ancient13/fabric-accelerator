@@ -1,4 +1,4 @@
-// Scope a
+// Scope
 targetScope = 'subscription'
 
 // Parameters test
