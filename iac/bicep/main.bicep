@@ -6,7 +6,7 @@ targetScope = 'subscription'
 param dprg string= 'fabricautov1'
 
 @description('Resource group location')
-param rglocation string = 'eastus'
+param rglocation string = 'australiaeast'
 
 @description('Cost Centre tag that will be applied to all resources in this deployment')
 param cost_centre_tag string = 'MCAPS'
@@ -24,7 +24,7 @@ param deployment_suffix string = utcNow()
 param purviewrg string= 'rg-purview'
 
 @description('Flag to indicate whether to create a new Purview resource with this data platform deployment')
-param create_purview bool = true
+param create_purview bool = false
 
 @description('Flag to indicate whether to enable integration of data platform resources with either an existing or new Purview resource')
 param enable_purview bool = true
