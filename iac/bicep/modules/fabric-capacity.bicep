@@ -34,8 +34,8 @@ param skuName string = 'F64'
 param skuTier string = 'Fabric'
 
 @description('The list of administrators for the Fabric Capacity instance.')
-//@secure()
-param adminUsers array
+@secure()
+param adminUsers string
 
 
 // Variables
@@ -58,6 +58,7 @@ resource fabricCapacity 'Microsoft.Fabric/capacities@2023-11-01' = {
   properties: {
     administration: {
       members: adminUsers
+      
     }
   }
 }
