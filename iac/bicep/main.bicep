@@ -6,7 +6,7 @@ targetScope = 'subscription'
 param dprg string= 'FabricAuto'
 
 @description('Resource group location')
-param rglocation string = 'australiaeast'
+param rglocation string = 'australiasoutheast'
 
 @description('Cost Centre tag that will be applied to all resources in this deployment')
 param cost_centre_tag string = 'MCAPS'
