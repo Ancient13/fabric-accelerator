@@ -1,7 +1,7 @@
 // Scope
 targetScope = 'subscription'
 
-// Parameters
+// Parameters test
 @description('Resource group where Microsoft Fabric capacity will be deployed. Resource group will be created if it doesnt exist')
 param dprg string= 'rg-fabric'
 
