@@ -1,11 +1,11 @@
 name: Provision Fabric Data Platform
-#on: workflow_dispatch  
-on:
-  push:
-    branches:
-        - main
-    paths:
-        - '**.bicep'
+on: workflow_dispatch  
+# on:
+#   push:
+#     branches:
+#         - main
+#     paths:
+#         - '**.bicep'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
