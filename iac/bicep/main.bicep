@@ -21,7 +21,7 @@ param sme_tag string ='sombrero@contoso.com'
 param deployment_suffix string = utcNow()
 
 @description('Resource group where Purview will be deployed. Resource group will be created if it doesnt exist')
-param purviewrg string= 'rg-purview'
+param purviewrg string= 'fabricautov2'
 
 @description('Flag to indicate whether to create a new Purview resource with this data platform deployment')
 param create_purview bool = false
