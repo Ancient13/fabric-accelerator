@@ -118,13 +118,30 @@ module kv './modules/keyvault.bicep' = {
      cost_centre_tag: cost_centre_tag
      owner_tag: owner_tag
      sme_tag: sme_tag
-     purview_account_name: purview.outputs.purview_account_name
-     purviewrg: purviewrg
      accessPolicyObjectIds: [
       adminUserObjID
      ]
   }
 }
+
+// // Deploy Key Vault with default access policies using module
+// module kv './modules/keyvault.bicep' = {
+//   name: keyvault_deployment_name
+//   scope: fabric_rg
+//   params:{
+//      location: fabric_rg.location
+//      keyvault_name: 'ba-kv01'
+//      create_purview: create_purview
+//      cost_centre_tag: cost_centre_tag
+//      owner_tag: owner_tag
+//      sme_tag: sme_tag
+//      purview_account_name: purview.outputs.purview_account_name
+//      purviewrg: purviewrg
+//      accessPolicyObjectIds: [
+//       adminUserObjID
+//      ]
+//   }
+// }
 
 resource kv_ref 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: kv.outputs.keyvault_name
