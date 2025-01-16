@@ -74,7 +74,7 @@ resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' ={
 }
 
 // Create Key Vault Access Policies for Purview
-resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = if (create_purview) {
+resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = {
     name: purview_account_name
     scope: resourceGroup(purviewrg)
   }

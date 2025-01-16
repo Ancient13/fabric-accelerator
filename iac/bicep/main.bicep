@@ -114,6 +114,7 @@ module kv './modules/keyvault.bicep' = {
   params:{
      location: fabric_rg.location
      keyvault_name: 'ba-kv01'
+     create_purview: create_purview
      cost_centre_tag: cost_centre_tag
      owner_tag: owner_tag
      sme_tag: sme_tag
@@ -122,7 +123,6 @@ module kv './modules/keyvault.bicep' = {
      accessPolicyObjectIds: [
       adminUserObjID
      ]
-     create_purview: create_purview
   }
 }
 
