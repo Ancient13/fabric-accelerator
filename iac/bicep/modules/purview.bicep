@@ -1,7 +1,4 @@
 // Parameters
-@description('Flag to indicate whether to create a new Purview resource with this data platform deployment')
-param create_purview bool=false
-
 @description('Resource Name of new or existing Purview Account. Specify a resource name if create_purview=true or enable_purview=true')
 param purview_name string
 
@@ -27,7 +24,7 @@ var managed_synapse_rg_name = 'mrg_${purview_uniquename}'
 
 
 // Create Purview resource
-resource purview_account 'Microsoft.Purview/accounts@2024-04-01-preview'= if (create_purview) {
+resource purview_account 'Microsoft.Purview/accounts@2024-04-01-preview'= {
   name: purview_uniquename
   location: location
   tags: {
@@ -44,12 +41,12 @@ resource purview_account 'Microsoft.Purview/accounts@2024-04-01-preview'= if (cr
   }
   }
   
-  resource existing_purview_account 'Microsoft.Purview/accounts@2024-04-01-preview' existing = if (!create_purview) {
+  resource existing_purview_account 'Microsoft.Purview/accounts@2024-04-01-preview' existing = {
     name: purview_uniquename
     scope: resourceGroup(purviewrg)
   }
 
-  output purview_account_name string = create_purview ? purview_account.name: existing_purview_account.name
-  output purview_resourceid string = create_purview ? purview_account.id: existing_purview_account.id
-  output purview_resource object = create_purview ? purview_account: existing_purview_account
+  output purview_account_name string = existing_purview_account.name
+  output purview_resourceid string = existing_purview_account.id
+  output purview_resource object = existing_purview_account
  
