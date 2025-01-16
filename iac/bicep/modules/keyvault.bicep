@@ -26,7 +26,6 @@ param accessPolicyObjectIds array
 
 // Variables
 var suffix = uniqueString(resourceGroup().id)
-var keyvault_uniquename = '${keyvault_name}-${suffix}'
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
 var skuName = 'standard'
 
@@ -37,7 +36,7 @@ var sqlAdminPassword = base64(uniqueString(resourceGroup().id, 'sqlAdminPassword
 
 // Create Key Vault
 resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' ={
-  name: keyvault_uniquename
+  name: keyvault_name
   location: location
   tags: {
     CostCentre: cost_centre_tag
