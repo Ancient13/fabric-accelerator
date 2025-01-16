@@ -26,7 +26,7 @@ jobs:
         region: australiaeast
         subscriptionId: ${{ secrets.SUBSCRIPTION_ID }}
         template: iac/bicep/main.bicep
-        parameters: 'spnClientId=${{ secrets.ACTION_SPN_CLIENTID }} spnClientSecret=${{ secrets.ACTION_SPN_SECRET }} spnTenantId=${{ secrets.TENANT_ID }} adminUser=${{ secrets.ADMIN_USER }} adminUserObjID=${{ secrets.ADMIN_USER_OBJID }}'
+        parameters: 'spnClientId=${{ secrets.ACTION_SPN_CLIENTID }} adminUser=${{ secrets.ADMIN_USER }} adminUserObjID=${{ secrets.ADMIN_USER_OBJID }}'
         failOnStdErr: false
 
 
