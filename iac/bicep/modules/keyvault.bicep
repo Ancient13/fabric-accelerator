@@ -25,7 +25,7 @@ param purviewrg string
 param accessPolicyObjectIds array
 
 // Variables
-var suffix = uniqueString(resourceGroup().id)
+
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
 var skuName = 'standard'
 
