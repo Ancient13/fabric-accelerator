@@ -45,7 +45,7 @@ param sqladmin string = 'sqladmin'
 var fabric_deployment_name = 'fabric_dataplatform_deployment_${deployment_suffix}'
 var purview_deployment_name = 'purview_deployment_${deployment_suffix}'
 var keyvault_deployment_name = 'keyvault_deployment_${deployment_suffix}'
-var keyvault_name = '${dprg}_${deployment_suffix}'
+var keyvault_name = '${dprg}_kv'
 var audit_deployment_name = 'audit_deployment_${deployment_suffix}'
 var controldb_deployment_name = 'controldb_deployment_${deployment_suffix}'
 
