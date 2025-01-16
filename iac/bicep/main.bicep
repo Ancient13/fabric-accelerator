@@ -24,13 +24,13 @@ param sme_tag string ='sombrero@contoso.com'
 param deployment_suffix string = utcNow()
 
 @description('Resource group where Purview will be deployed. Resource group will be created if it doesnt exist')
-param purviewrg string= 'fabricautov2'
+param purviewrg string= 'rg-purview'
 
 @description('Resource Name of new or existing Purview Account. Specify a resource name if create_purview=true or enable_purview=true')
 param purview_name string = 'ContosoDGtsPurview'
 
 @description('Resource group where audit resources will be deployed. Resource group will be created if it doesnt exist')
-param auditrg string= 'rg-audit2'
+param auditrg string= 'rg-audit'
 
 @description('Entra Admin user for Fabric Capacity')
 param adminUser string 
