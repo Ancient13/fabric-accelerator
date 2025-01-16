@@ -8,6 +8,9 @@ param dprg string= 'fabricautov2'
 @description('Resource group location')
 param rglocation string = 'australiaeast'
 
+@description('Purview Resource group location')
+param rgpurviewlocation string = 'eastus'
+
 @description('Cost Centre tag that will be applied to all resources in this deployment')
 param cost_centre_tag string = 'MCAPS'
 
@@ -23,20 +26,11 @@ param deployment_suffix string = utcNow()
 @description('Resource group where Purview will be deployed. Resource group will be created if it doesnt exist')
 param purviewrg string= 'fabricautov2'
 
-@description('Flag to indicate whether to create a new Purview resource with this data platform deployment')
-param create_purview bool = false
-
-@description('Flag to indicate whether to enable integration of data platform resources with either an existing or new Purview resource')
-param enable_purview bool = false
-
 @description('Resource Name of new or existing Purview Account. Specify a resource name if create_purview=true or enable_purview=true')
 param purview_name string = 'ContosoDGtsPurview'
 
 @description('Resource group where audit resources will be deployed. Resource group will be created if it doesnt exist')
 param auditrg string= 'rg-audit2'
-
-@description('spn client id')
-param spnClientId string
 
 @description('Entra Admin user for Fabric Capacity')
 param adminUser string 
@@ -51,6 +45,7 @@ param sqladmin string = 'sqladmin'
 var fabric_deployment_name = 'fabric_dataplatform_deployment_${deployment_suffix}'
 var purview_deployment_name = 'purview_deployment_${deployment_suffix}'
 var keyvault_deployment_name = 'keyvault_deployment_${deployment_suffix}'
+var keyvault_name = '${dprg}_${deployment_suffix}'
 var audit_deployment_name = 'audit_deployment_${deployment_suffix}'
 var controldb_deployment_name = 'controldb_deployment_${deployment_suffix}'
 
@@ -69,9 +64,9 @@ resource fabric_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
 
 
 // Create purview resource group
-resource purview_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = if (create_purview) {
+resource purview_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: purviewrg 
-  location: rglocation
+  location: rgpurviewlocation
   tags: {
          CostCentre: cost_centre_tag
          Owner: owner_tag
@@ -92,11 +87,10 @@ resource audit_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
 
 
  // Deploy Purview using module
-module purview './modules/purview.bicep' = if (create_purview || enable_purview) {
+module purview './modules/purview.bicep' = {
   name: purview_deployment_name
   scope: purview_rg
   params:{
-    create_purview: create_purview
     purviewrg: purviewrg
     purview_name: purview_name
     location: purview_rg.location
@@ -114,8 +108,7 @@ module kv './modules/keyvault.bicep' = {
   scope: fabric_rg
   params:{
      location: fabric_rg.location
-     keyvault_name: 'ba-kv01'
-     create_purview: create_purview
+     keyvault_name: keyvault_name
      cost_centre_tag: cost_centre_tag
      owner_tag: owner_tag
      sme_tag: sme_tag
@@ -161,26 +154,26 @@ module fabric_capacity './modules/fabric-capacity.bicep' = {
   }
 }
 
-// //Deploy SQL control DB 
-// module controldb './modules/sqldb.bicep' = {
-//   name: controldb_deployment_name
-//   scope: fabric_rg
-//   params:{
-//      sqlserver_name: 'ba-sql01'
-//      database_name: 'controlDB' 
-//      location: fabric_rg.location
-//      cost_centre_tag: cost_centre_tag
-//      owner_tag: owner_tag
-//      sme_tag: sme_tag
-//      sql_admin_username: sqladmin
-//      sql_admin_password: kv_ref.getSecret('sqlserver-admin-password')
-//      ad_admin_username:  adminUser
-//      ad_admin_sid:  adminUserObjID  
-//      auto_pause_duration: 60
-//      database_sku_name: 'GP_S_Gen5_1' 
-//      enable_purview: enable_purview
-//      purview_resource: purview.outputs.purview_resource
-//      audit_storage_name: audit_integration.outputs.audit_storage_uniquename
-//      auditrg: audit_rg.name
-//   }
-// }
+//Deploy SQL control DB 
+module controldb './modules/sqldb.bicep' = {
+  name: controldb_deployment_name
+  scope: fabric_rg
+  params:{
+     sqlserver_name: 'ba-sql01'
+     database_name: 'controlDB' 
+     location: fabric_rg.location
+     cost_centre_tag: cost_centre_tag
+     owner_tag: owner_tag
+     sme_tag: sme_tag
+     sql_admin_username: sqladmin
+     sql_admin_password: kv_ref.getSecret('sqlserver-admin-password')
+     ad_admin_username:  adminUser
+     ad_admin_sid:  adminUserObjID  
+     auto_pause_duration: 60
+     database_sku_name: 'GP_S_Gen5_1' 
+     enable_purview: true
+     purview_resource: purview.outputs.purview_resource
+     audit_storage_name: audit_integration.outputs.audit_storage_uniquename
+     auditrg: audit_rg.name
+  }
+}

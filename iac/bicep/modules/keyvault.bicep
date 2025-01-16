@@ -15,9 +15,6 @@ param sme_tag string
 @description('Key Vault name')
 param keyvault_name string
 
-@description('Create Purview ?')
-param create_purview bool
-
 @description('Purview Account name')
 param purview_account_name string
 
@@ -73,25 +70,25 @@ resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' ={
   }
 }
 
-// // Create Key Vault Access Policies for Purview
-// resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = if (create_purview) {
-//   name: purview_account_name
-//   scope: resourceGroup(purviewrg)
-// }
+// Create Key Vault Access Policies for Purview
+resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = {
+  name: purview_account_name
+  scope: resourceGroup(purviewrg)
+}
   
-// resource this_keyvault_accesspolicy 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = if (create_purview) {
-//   name: 'add'
-//   parent: keyvault
-//   properties: {
-//     accessPolicies: [
-//       {
-//         tenantId: subscription().tenantId
-//         objectId: existing_purview_account.identity.principalId
-//         permissions: { secrets: ['list', 'get'] }
-//       }
-//     ]
-//   }
-// }
+resource this_keyvault_accesspolicy 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = {
+  name: 'add'
+  parent: keyvault
+  properties: {
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: existing_purview_account.identity.principalId
+        permissions: { secrets: ['list', 'get'] }
+      }
+    ]
+  }
+}
 
 // Add secrets to the Key Vault
 resource sqlAdminPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
