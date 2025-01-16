@@ -15,15 +15,27 @@ param sme_tag string
 @description('Key Vault name')
 param keyvault_name string
 
+@description('Create Purview ?')
+param create_purview bool
+
 @description('Purview Account name')
 param purview_account_name string
 
 @description('Resource group of Purview Account')
 param purviewrg string
 
+@description('Object IDs for default access policies.')
+param accessPolicyObjectIds array
+
 // Variables
 var suffix = uniqueString(resourceGroup().id)
 var keyvault_uniquename = '${keyvault_name}-${suffix}'
+@description('Specifies whether the key vault is a standard vault or a premium vault.')
+var skuName = 'standard'
+
+@description('Specifies the name of the secret that you want to create.')
+
+var sqlAdminPassword = base64(uniqueString(resourceGroup().id, 'sqlAdminPassword'))
 
 
 // Create Key Vault
@@ -36,39 +48,38 @@ resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' ={
     SME: sme_tag
   }
   properties:{
-    tenantId: subscription().tenantId
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
     enabledForDeployment: true
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: true
+    tenantId: subscription().tenantId
+
     // Default Access Policies. Replace the ObjectID's with your user/group id
-    accessPolicies:[
-      { tenantId: subscription().tenantId
-        objectId: '01e16ca5-e5da-49f3-ac27-a46f1cc68ede' // Replace this with your user/group ObjectID
-        permissions: {secrets:['list','get','set']}
-      }
-      { tenantId: subscription().tenantId
-        objectId: '688ad7c8-d7bb-4f32-884a-05601c9762a2' // Replace this with your user/group ObjectID
-        permissions: {secrets:['list','get','set']}
-      }
-      { tenantId: subscription().tenantId
-        objectId: '703595dd-9298-4ef8-ab80-a64f10e8ea07' // Replace this with your user/group ObjectID
-        permissions: {secrets:['list','get']}
+    accessPolicies: [
+      for objectId in accessPolicyObjectIds: {
+        tenantId: subscription().tenantId
+        objectId: objectId
+        permissions: { secrets: ['list', 'get', 'set'] }
       }
     ]
+    sku: {
+      name: skuName
+      family: 'A'
+
+    }
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
   }
 }
 
 // Create Key Vault Access Policies for Purview
-resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = {
+resource existing_purview_account 'Microsoft.Purview/accounts@2021-07-01' existing = if (create_purview) {
     name: purview_account_name
     scope: resourceGroup(purviewrg)
   }
   
-resource this_keyvault_accesspolicy 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = {
+resource this_keyvault_accesspolicy 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = if (create_purview) {
   name: 'add'
   parent: keyvault
   properties: {
@@ -81,5 +92,15 @@ resource this_keyvault_accesspolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
     ]
   }
 }
+
+// Add secrets to the Key Vault
+resource sqlAdminPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyvault
+  name: 'sqlserver-admin-password'
+  properties: {
+    value: sqlAdminPassword
+  }
+}
+
 
 output keyvault_name string = keyvault.name

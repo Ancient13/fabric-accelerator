@@ -35,6 +35,17 @@ param purview_name string = 'ContosoDGtsPurview'
 @description('Resource group where audit resources will be deployed. Resource group will be created if it doesnt exist')
 param auditrg string= 'rg-audit2'
 
+@description('spn client id')
+param spnClientId string
+
+@description('Entra Admin user for Fabric Capacity')
+param adminUser string 
+
+@description('Entra Admin user Object ID')
+param adminUserObjID string 
+
+@description('Admin user for SQL')
+param sqladmin string = 'sqladmin'
 
 // Variables
 var fabric_deployment_name = 'fabric_dataplatform_deployment_${deployment_suffix}'
@@ -42,6 +53,8 @@ var purview_deployment_name = 'purview_deployment_${deployment_suffix}'
 var keyvault_deployment_name = 'keyvault_deployment_${deployment_suffix}'
 var audit_deployment_name = 'audit_deployment_${deployment_suffix}'
 var controldb_deployment_name = 'controldb_deployment_${deployment_suffix}'
+
+
 
 // Create data platform resource group
 resource fabric_rg  'Microsoft.Resources/resourceGroups@2024-03-01' = {
@@ -106,6 +119,10 @@ module kv './modules/keyvault.bicep' = {
      sme_tag: sme_tag
      purview_account_name: purview.outputs.purview_account_name
      purviewrg: purviewrg
+     accessPolicyObjectIds: [
+      adminUserObjID
+     ]
+     create_purview: create_purview
   }
 }
 
@@ -113,6 +130,8 @@ resource kv_ref 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: kv.outputs.keyvault_name
   scope: fabric_rg
 }
+
+
 
 //Enable auditing for data platform resources
 module audit_integration './modules/audit.bicep' = {
@@ -139,7 +158,7 @@ module fabric_capacity './modules/fabric-capacity.bicep' = {
     cost_centre_tag: cost_centre_tag
     owner_tag: owner_tag
     sme_tag: sme_tag
-    adminUsers: kv_ref.getSecret('fabric-capacity-admin-username')
+    adminUsers: adminUser
   }
 }
 
@@ -154,10 +173,10 @@ module controldb './modules/sqldb.bicep' = {
      cost_centre_tag: cost_centre_tag
      owner_tag: owner_tag
      sme_tag: sme_tag
-     sql_admin_username: kv_ref.getSecret('sqlserver-admin-username')
+     sql_admin_username: sqladmin
      sql_admin_password: kv_ref.getSecret('sqlserver-admin-password')
-     ad_admin_username:  kv_ref.getSecret('sqlserver-ad-admin-username')
-     ad_admin_sid:  kv_ref.getSecret('sqlserver-ad-admin-sid')  
+     ad_admin_username:  adminUser
+     ad_admin_sid:  adminUserObjID  
      auto_pause_duration: 60
      database_sku_name: 'GP_S_Gen5_1' 
      enable_purview: enable_purview
