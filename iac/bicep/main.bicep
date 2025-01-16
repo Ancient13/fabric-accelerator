@@ -161,26 +161,26 @@ module fabric_capacity './modules/fabric-capacity.bicep' = {
   }
 }
 
-//Deploy SQL control DB 
-module controldb './modules/sqldb.bicep' = {
-  name: controldb_deployment_name
-  scope: fabric_rg
-  params:{
-     sqlserver_name: 'ba-sql01'
-     database_name: 'controlDB' 
-     location: fabric_rg.location
-     cost_centre_tag: cost_centre_tag
-     owner_tag: owner_tag
-     sme_tag: sme_tag
-     sql_admin_username: sqladmin
-     sql_admin_password: kv_ref.getSecret('sqlserver-admin-password')
-     ad_admin_username:  adminUser
-     ad_admin_sid:  adminUserObjID  
-     auto_pause_duration: 60
-     database_sku_name: 'GP_S_Gen5_1' 
-     enable_purview: enable_purview
-     purview_resource: purview.outputs.purview_resource
-     audit_storage_name: audit_integration.outputs.audit_storage_uniquename
-     auditrg: audit_rg.name
-  }
-}
+// //Deploy SQL control DB 
+// module controldb './modules/sqldb.bicep' = {
+//   name: controldb_deployment_name
+//   scope: fabric_rg
+//   params:{
+//      sqlserver_name: 'ba-sql01'
+//      database_name: 'controlDB' 
+//      location: fabric_rg.location
+//      cost_centre_tag: cost_centre_tag
+//      owner_tag: owner_tag
+//      sme_tag: sme_tag
+//      sql_admin_username: sqladmin
+//      sql_admin_password: kv_ref.getSecret('sqlserver-admin-password')
+//      ad_admin_username:  adminUser
+//      ad_admin_sid:  adminUserObjID  
+//      auto_pause_duration: 60
+//      database_sku_name: 'GP_S_Gen5_1' 
+//      enable_purview: enable_purview
+//      purview_resource: purview.outputs.purview_resource
+//      audit_storage_name: audit_integration.outputs.audit_storage_uniquename
+//      auditrg: audit_rg.name
+//   }
+// }
