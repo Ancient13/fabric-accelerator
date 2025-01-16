@@ -131,8 +131,6 @@ resource kv_ref 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   scope: fabric_rg
 }
 
-
-
 //Enable auditing for data platform resources
 module audit_integration './modules/audit.bicep' = {
   name: audit_deployment_name
